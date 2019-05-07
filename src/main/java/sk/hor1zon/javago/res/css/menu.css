@@ -1,4 +1,6 @@
-#root {
+#menu {
 	-fx-background-image: url("../img/menu_bg.jpg");
 }
-
+#settings {
+	-fx-background-image: url("../img/menu_bg.jpg");
+}
