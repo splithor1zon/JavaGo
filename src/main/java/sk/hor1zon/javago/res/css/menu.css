@@ -1,6 +1,9 @@
-#menu {
+#menu, #settings, #loadBP {
 	-fx-background-image: url("../img/menu_bg.jpg");
 }
-#settings {
-	-fx-background-image: url("../img/menu_bg.jpg");
+#startBtn, #loadBtn {
+	-fx-background-color: linear-gradient(greenyellow, limegreen );
+    -fx-text-fill: black;
+    -fx-font-size: 16.0px;
+	-fx-padding: 2.5 15.0 2.5 15.0;
 }

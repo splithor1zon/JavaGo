@@ -21,6 +21,8 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
@@ -38,19 +40,20 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Pair;
-import sk.hor1zon.javago.game.GameModel;
+import sk.hor1zon.javago.models.InitModel;
+import sk.hor1zon.javago.utils.Settings;
 import sk.hor1zon.javago.game.GameType;
-import sk.hor1zon.javago.game.Settings;
 
 public class Menu extends Application implements Observer {
-	private GameStatus status = null;
 	private Scene mainMenuScene;
 	private Scene loadGameScene;
 	private Stage ps;
@@ -73,17 +76,15 @@ public class Menu extends Application implements Observer {
 
 	@Override
 	public void update(java.util.Observable obs, Object arg) {
-		GameModel gm = (GameModel) obs;
-		status = (GameStatus) arg;
-		if (status == GameStatus.NEW) {
+		if ((boolean) arg) {
 			ps.setTitle("JavaGo - New");
-			ps.setScene(gameSettings(gm.getSettings()));
+			ps.setScene(gameSettings(((InitModel) obs).getSettings()));
 		} else {
 			ps.setTitle("JavaGo - Load");
 			ps.setScene(loadGameScene);
 		}
 	}
-	
+
 	public void showMenu() {
 		ps.setTitle("JavaGo");
 		ps.setScene(mainMenuScene);
@@ -91,7 +92,6 @@ public class Menu extends Application implements Observer {
 
 	private Scene gameSettings(Settings settings) {
 		Map<String, String> settingsMap = settings.toMap();
-		Optional<Pair<String, String>> dialogResult;
 		GridPane form = new GridPane();
 		form.setAlignment(Pos.TOP_LEFT);
 		form.setHgap(10);
@@ -377,14 +377,13 @@ public class Menu extends Application implements Observer {
 		// clicked.
 		dialogC.setResultConverter(dialogButton -> {
 			if (dialogButton == okType) {
-				return new Pair<>(player2C.getText(), ip.getText() + "+" + portC.getText());
+				return new Pair<>(player2C.getText(), ip.getText() + ";" + portC.getText());
 			}
 			return null;
 		});
 
 		///
-		Button multiBtn = new Button();
-		multiBtn.setText("Multiplayer Settings");
+		Button multiBtn = new Button("Multiplayer Settings");
 		multiBtn.setOnAction(new EventHandler<ActionEvent>() {
 
 			@Override
@@ -408,9 +407,11 @@ public class Menu extends Application implements Observer {
 					break;
 				case "CLIENT":
 					dialogC.showAndWait().ifPresent(playerIPPort -> {
+						System.out.println(playerIPPort.getValue());
+						String[] ipPort = playerIPPort.getValue().split(";");
 						settingsMap.replace("player2", playerIPPort.getKey());
-						settingsMap.replace("ip", playerIPPort.getValue().split("+")[0]);
-						settingsMap.replace("port", playerIPPort.getValue().split("+")[1]);
+						settingsMap.replace("ip", ipPort[0]);
+						settingsMap.replace("port", ipPort[1]);
 					});
 					break;
 				}
@@ -436,8 +437,13 @@ public class Menu extends Application implements Observer {
 				settingsMap.replace("playerColor", (String) color.getSelectedToggle().getUserData());
 				settingsMap.replace("rules", (String) rules.getSelectedToggle().getUserData());
 				if (settings.parseMap(settingsMap)) {
-					settings.writeSettings();
+					if (settings.write()) {
+						form.add(new ImageView(this.getClass().getResource("res/img/ok_tick.png").toString()), 1, 7);
+					} else {
+						form.add(new ImageView(this.getClass().getResource("res/img/ko_cross.png").toString()), 1, 7);
+					}
 				} else {
+					form.add(new ImageView(this.getClass().getResource("res/img/ko_cross.png").toString()), 1, 7);
 
 				}
 			}
@@ -455,7 +461,7 @@ public class Menu extends Application implements Observer {
 			}
 		});
 		form.add(backBtn, 2, 7);
-		
+
 		//
 		Button startBtn = new Button();
 		startBtn.setText("Start!");
@@ -464,7 +470,8 @@ public class Menu extends Application implements Observer {
 
 			@Override
 			public void handle(ActionEvent event) {
-				
+				Init.initGame(settings);
+				ps.close();
 			}
 		});
 		form.add(startBtn, 3, 7);
@@ -488,51 +495,75 @@ public class Menu extends Application implements Observer {
 	}
 
 	private Scene loadGame() {
-		Button newBtn = new Button();
-		newBtn.setText("New Game");
-		newBtn.setOnAction(new EventHandler<ActionEvent>() {
+		Alert nafDialog = new Alert(AlertType.ERROR);
+		nafDialog.setTitle("Error");
+		nafDialog.setHeaderText("Not a File!");
+		nafDialog.setContentText("The path you entered does not correspond to a valid file or is unreadable!");
 
+		TextField filePath = new TextField();
+		filePath.setPrefWidth(240);
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Open Game File");
+		// fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JavaGo save", "*.jgo"));
+		Button fileOpenBtn = new Button("Open...");
+
+		fileOpenBtn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
-			public void handle(ActionEvent event) {
-				status = GameStatus.NEW;
-				System.out.println("sadsafsf");
+			public void handle(final ActionEvent e) {
+				File file = fileChooser.showOpenDialog(ps);
+				if (file != null) {
+					filePath.setText(file.getAbsolutePath());
+				}
 			}
 		});
-		Button loadBtn = new Button();
-		loadBtn.setText("Load Game");
+
+		Button loadBtn = new Button("Load!");
+		loadBtn.setId("loadBtn");
 		loadBtn.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(final ActionEvent e) {
+				File file = new File(filePath.getText());
+				if (file != null && file.canRead() && file.getName().endsWith(".jgo")) {
+					Init.initGame(file);
+					ps.close();
+				} else {
+					nafDialog.showAndWait();
+				}
+			}
+		});
+
+		Button backBtn = new Button();
+		backBtn.setText("<< Back");
+		backBtn.setOnAction(new EventHandler<ActionEvent>() {
 
 			@Override
 			public void handle(ActionEvent event) {
-				status = GameStatus.LOAD;
-				System.out.println("Load");
+				showMenu();
 			}
 		});
-		Button replayBtn = new Button();
-		replayBtn.setText("Replay Game");
-		replayBtn.setOnAction(new EventHandler<ActionEvent>() {
 
-			@Override
-			public void handle(ActionEvent event) {
-				status = GameStatus.REPLAY;
-				System.out.println("Replay");
-			}
-		});
-		Text header = new Text("JavaGo");
-		header.setFont(Font.font("Calibri", FontWeight.NORMAL, 42));
+		HBox fileBox = new HBox(5);
+		fileBox.getChildren().addAll(filePath, fileOpenBtn);
+		fileBox.setAlignment(Pos.CENTER);
 
-		VBox buttons = new VBox(5);
-		buttons.getChildren().addAll(newBtn, loadBtn, replayBtn);
-		buttons.setAlignment(Pos.CENTER);
+		HBox buttonBox = new HBox(5);
+		buttonBox.getChildren().addAll(backBtn, loadBtn);
+		buttonBox.setAlignment(Pos.CENTER_RIGHT);
+
+		Text header = new Text("Load Game");
+		header.setFont(Font.font("Calibri", FontWeight.NORMAL, 32));
 
 		BorderPane bpane = new BorderPane();
-		bpane.setId("root");
+		bpane.setId("loadBP");
 		BorderPane.setAlignment(header, Pos.CENTER);
 		BorderPane.setMargin(header, new Insets(10, 0, 10, 0));
+		BorderPane.setMargin(buttonBox, new Insets(15, 20, 15, 20));
 		bpane.setTop(header);
-		bpane.setCenter(buttons);
+		bpane.setCenter(fileBox);
+		bpane.setBottom(buttonBox);
 
-		Scene scene = new Scene(bpane, 480, 384);
+		Scene scene = new Scene(bpane, 384, 384);
 		scene.getStylesheets().add(getClass().getResource("res/css/menu.css").toExternalForm());
 
 		return scene;
@@ -545,7 +576,7 @@ public class Menu extends Application implements Observer {
 
 			@Override
 			public void handle(ActionEvent event) {
-				Init.initModel(GameStatus.NEW, ref);
+				Init.initModel(true, ref);
 			}
 		});
 		Button loadBtn = new Button();
@@ -554,23 +585,14 @@ public class Menu extends Application implements Observer {
 
 			@Override
 			public void handle(ActionEvent event) {
-				Init.initModel(GameStatus.LOAD, ref);
-			}
-		});
-		Button replayBtn = new Button();
-		replayBtn.setText("Replay Game");
-		replayBtn.setOnAction(new EventHandler<ActionEvent>() {
-
-			@Override
-			public void handle(ActionEvent event) {
-				Init.initModel(GameStatus.REPLAY, ref);
+				Init.initModel(false, ref);
 			}
 		});
 		Text header = new Text("JavaGo");
 		header.setFont(Font.font("Calibri", FontWeight.NORMAL, 42));
 
 		VBox buttons = new VBox(5);
-		buttons.getChildren().addAll(newBtn, loadBtn, replayBtn);
+		buttons.getChildren().addAll(newBtn, loadBtn);
 		buttons.setAlignment(Pos.CENTER);
 
 		BorderPane bpane = new BorderPane();

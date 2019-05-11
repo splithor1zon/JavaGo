@@ -1,1 +1,1 @@
-{"type":"LOCAL","ip":"127.0.0.1","port":30303,"player1":"","player2":"","board":19,"handicap":0,"komi":0.0,"byoyomi":0,"playerColor":"black","rules":"japanese"}
+{"type":"SERVER","ip":"127.0.0.1","port":30303,"player1":"","player2":"","board":19,"handicap":0,"komi":6.5,"byoyomi":0,"playerColor":"black","rules":"japanese"}

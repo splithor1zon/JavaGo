@@ -1,15 +1,20 @@
-package sk.hor1zon.javago.game;
+package sk.hor1zon.javago.utils;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.fasterxml.jackson.core.JsonGenerationException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+
+import sk.hor1zon.javago.game.GameType;
 
 // TODO - validation
 public class Settings {
@@ -90,28 +95,42 @@ public class Settings {
 		}
 	}
 
-	public static Settings loadSettings(String path) {
+	public static Settings load(String path) {
 		// Settings loader
-		ObjectMapper objectMapper = new ObjectMapper();
+		String json = "";
 		Settings settings = new Settings();
 		try {
-			settings = objectMapper.readValue(new File(path), Settings.class);
-			System.out.println("Settings loaded from: " + path);
+			FileInputStream inStream = new FileInputStream(path);
+			BufferedReader inReader = new BufferedReader(new InputStreamReader(inStream));
+			String dataRow = "";
+			while ((dataRow = inReader.readLine()) != null) {
+				json += dataRow;
+			}
+			inReader.close();
+			
+			Gson gson = new Gson();
+			settings = gson.fromJson(json, Settings.class);
 		} catch (Exception e) {
 			System.err.println("Cannot read settings, using defaults.");
 			settings.useDefaults();
 		}
+		
+		System.out.println("Settings loaded from: " + path);
 		return settings;
 	}
 
-	public static Settings loadSettings() {
-		return loadSettings(DEFAULT_PATH);
+	public static Settings load() {
+		return load(DEFAULT_PATH);
 	}
 
-	public boolean writeSettings(String path) {
-		ObjectMapper objectMapper = new ObjectMapper();
+	public boolean write(String path) {
+		String serializedSettings = new Gson().toJson(this);
 		try {
-			objectMapper.writeValue(new File(path), this);
+			FileOutputStream outStream = new FileOutputStream(path, false);
+			OutputStreamWriter outWriter = new OutputStreamWriter(outStream);
+			outWriter.write(serializedSettings);
+			outWriter.close();
+			outStream.close();
 		} catch (Exception e) {
 			System.err.println("Cannot write settings.");
 			return false;
@@ -120,8 +139,8 @@ public class Settings {
 		return true;
 	}
 
-	public boolean writeSettings() {
-		return writeSettings(DEFAULT_PATH);
+	public boolean write() {
+		return write(DEFAULT_PATH);
 	}
 
 	public Map<String, String> toMap() {
