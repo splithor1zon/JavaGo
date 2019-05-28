@@ -1,0 +1,19 @@
+#board {
+	-fx-background-image: url("/img/kaya.jpg");
+}
+#dashboard {
+	-fx-background-image: url("/img/wall.jpg");
+}
+#active {
+	-fx-font-size: 32px;
+	-fx-font-family: Arial;
+	-fx-font-weight: bold;
+	-fx-underline: true;
+}
+#inactive {
+	-fx-font-size: 32px;
+	-fx-font-family: Arial;
+	-fx-font-weight: normal;
+	-fx-underline: false;
+	
+}

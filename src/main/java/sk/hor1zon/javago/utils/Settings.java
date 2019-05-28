@@ -1,40 +1,61 @@
 package sk.hor1zon.javago.utils;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.google.gson.Gson;
 
 import sk.hor1zon.javago.game.GameType;
 
-// TODO - validation
+/**
+ * Settings data storage.
+ * 
+ * @author splithor1zon
+ *
+ */
 public class Settings {
 	public final static String DEFAULT_PATH = "settings.json";
 	public GameType type;
-	public InetAddress ip;
+	public InetAddress ip; //
 	public int port;
 	public String player1;
-	public String player2;
+	public String player2; //
 	public int board;
 	public int handicap;
 	public double komi;
 	public int byoyomi;
 	public String playerColor;
-	public String rules;
+	public static Settings currentRef;
+	private static Logger l = Logger.getLogger(Settings.class.getName());
 
 	public Settings() {
 		useDefaults();
+		currentRef = this;
 	}
 
+	/**
+	 * Set public static settings reference to provided settings.
+	 * 
+	 * @param settings Settings to set to.
+	 */
+	public static void setSettings(Settings settings) {
+		currentRef = settings;
+	}
+
+	/**
+	 * Use default settings.
+	 */
 	public void useDefaults() {
 		type = GameType.LOCAL;
 		try {
@@ -43,16 +64,20 @@ public class Settings {
 			e.printStackTrace();
 		}
 		port = 30303;
-		player1 = "";
-		player2 = "";
+		player1 = "Alice";
+		player2 = "Bob";
 		board = 19;
 		handicap = 0;
 		komi = 6.5;
 		byoyomi = 0;
 		playerColor = "black";
-		rules = "japanese";
 	}
 
+	/**
+	 * Use specified default setting.
+	 * 
+	 * @param var Setting to set to default.
+	 */
 	public void useDefaults(String var) {
 		switch (var) {
 		case "type":
@@ -62,10 +87,10 @@ public class Settings {
 			port = 30303;
 			break;
 		case "player1":
-			player1 = "";
+			player1 = "Alice";
 			break;
 		case "player2":
-			player2 = "";
+			player2 = "Bob";
 			break;
 		case "board":
 			board = 19;
@@ -82,9 +107,6 @@ public class Settings {
 		case "playerColor":
 			playerColor = "black";
 			break;
-		case "rules":
-			rules = "japanese";
-			break;
 		case "ip":
 			try {
 				ip = InetAddress.getByName(null);
@@ -95,6 +117,12 @@ public class Settings {
 		}
 	}
 
+	/**
+	 * Loads settings from specified file.
+	 * 
+	 * @param path Path to settings file location.
+	 * @return Returns loaded settings.
+	 */
 	public static Settings load(String path) {
 		// Settings loader
 		String json = "";
@@ -107,22 +135,33 @@ public class Settings {
 				json += dataRow;
 			}
 			inReader.close();
-			
+
 			Gson gson = new Gson();
 			settings = gson.fromJson(json, Settings.class);
 		} catch (Exception e) {
-			System.err.println("Cannot read settings, using defaults.");
+			l.log(Level.WARNING, "Cannot read settings, using defaults.");
 			settings.useDefaults();
 		}
-		
-		System.out.println("Settings loaded from: " + path);
+
+		l.log(Level.INFO, "Settings loaded from: " + path);
 		return settings;
 	}
 
+	/**
+	 * Loads settings from default location.
+	 * 
+	 * @return Returns loaded settings.
+	 */
 	public static Settings load() {
 		return load(DEFAULT_PATH);
 	}
 
+	/**
+	 * Writes current setting into specified file.
+	 * 
+	 * @param path Where to write settings to.
+	 * @return Returns true if written successfully
+	 */
 	public boolean write(String path) {
 		String serializedSettings = new Gson().toJson(this);
 		try {
@@ -132,17 +171,27 @@ public class Settings {
 			outWriter.close();
 			outStream.close();
 		} catch (Exception e) {
-			System.err.println("Cannot write settings.");
+			l.log(Level.WARNING, "Cannot write settings.");
 			return false;
 		}
-		System.out.println("Settings written as: " + path);
+		l.log(Level.INFO, "Settings written as: " + path);
 		return true;
 	}
 
+	/**
+	 * Writes current setting into default file.
+	 * 
+	 * @return Returns true if written successfully
+	 */
 	public boolean write() {
 		return write(DEFAULT_PATH);
 	}
 
+	/**
+	 * Converts settings into map.
+	 * 
+	 * @return Returns settings representation in map.
+	 */
 	public Map<String, String> toMap() {
 		return new HashMap<String, String>(11, 1f) {
 			{
@@ -156,11 +205,16 @@ public class Settings {
 				put("komi", Double.toString(komi));
 				put("byoyomi", Integer.toString(byoyomi));
 				put("playerColor", playerColor);
-				put("rules", rules);
 			}
 		};
 	}
 
+	/**
+	 * Loads settings from map.
+	 * 
+	 * @param map Map in correct settings format.
+	 * @return Returns true if parsed successfully.
+	 */
 	public boolean parseMap(Map<String, String> map) {
 		for (Map.Entry<String, String> entry : map.entrySet()) {
 			switch (entry.getKey()) {
@@ -198,9 +252,10 @@ public class Settings {
 				break;
 			case "playerColor":
 				playerColor = entry.getValue();
-				break;
-			case "rules":
-				rules = entry.getValue();
+				if (playerColor == "nigiri") {
+					Random random = new Random();
+					playerColor = random.nextBoolean() ? "black" : "white";
+				}
 				break;
 			case "ip":
 				try {
@@ -210,7 +265,7 @@ public class Settings {
 				}
 				break;
 			default:
-				System.err.println("Cannot parse provided Map due to invalid Map entry, using defaults.");
+				l.log(Level.WARNING, "Cannot parse provided Map due to invalid Map entry, using defaults.");
 				useDefaults();
 				return false;
 			}

@@ -3,23 +3,18 @@ package sk.hor1zon.javago;
 import java.io.File;
 import java.util.Map;
 import java.util.Observer;
-import java.util.Optional;
 
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -30,18 +25,14 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.control.PasswordField;
 import javafx.scene.control.RadioButton;
-import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Toggle;
-import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -51,8 +42,12 @@ import javafx.stage.Stage;
 import javafx.util.Pair;
 import sk.hor1zon.javago.models.InitModel;
 import sk.hor1zon.javago.utils.Settings;
-import sk.hor1zon.javago.game.GameType;
 
+/**
+ * Provides initial GUI for setting up the game.
+ * @author splithor1zon
+ *
+ */
 public class Menu extends Application implements Observer {
 	private Scene mainMenuScene;
 	private Scene loadGameScene;
@@ -85,6 +80,9 @@ public class Menu extends Application implements Observer {
 		}
 	}
 
+	/**
+	 * Show the Menu.
+	 */
 	public void showMenu() {
 		ps.setTitle("JavaGo");
 		ps.setScene(mainMenuScene);
@@ -97,7 +95,6 @@ public class Menu extends Application implements Observer {
 		form.setHgap(10);
 		form.setVgap(10);
 		form.setPadding(new Insets(25, 25, 25, 25));
-
 		//
 		Text typeLabel = new Text("Game Type:");
 		typeLabel.setFont(Font.font("Calibri", FontWeight.NORMAL, 16));
@@ -122,6 +119,11 @@ public class Menu extends Application implements Observer {
 			type.selectToggle(typeL);
 			break;
 		}
+		type.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
+			public void changed(ObservableValue<? extends Toggle> ov, Toggle old_toggle, Toggle new_toggle) {
+				settingsMap.put("type", (String) new_toggle.getUserData());
+			}
+		});
 		form.add(typeLabel, 0, 0);
 		form.add(typeL, 1, 0);
 		form.add(typeS, 2, 0);
@@ -138,6 +140,17 @@ public class Menu extends Application implements Observer {
 				.select(settingsMap.get("handicap").equals("0") ? 0 : Integer.valueOf(settingsMap.get("handicap")) - 1);
 		handicap_9_13.getSelectionModel()
 				.select(settingsMap.get("handicap").equals("0") ? 0 : Integer.valueOf(settingsMap.get("handicap")) - 1);
+
+		handicap_9_13.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
+			public void changed(ObservableValue ov, Number value, Number new_value) {
+				settingsMap.put("handicap", handicap_9_13.getItems().get(new_value.intValue()));
+			}
+		});
+		handicap_19.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
+			public void changed(ObservableValue ov, Number value, Number new_value) {
+				settingsMap.put("handicap", handicap_19.getItems().get(new_value.intValue()));
+			}
+		});
 		form.add(handicapLabel, 0, 2);
 		form.add(handicap_19, 1, 2);
 		form.add(handicap_9_13, 1, 2);
@@ -157,6 +170,7 @@ public class Menu extends Application implements Observer {
 		board19.setToggleGroup(board);
 		board.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
 			public void changed(ObservableValue<? extends Toggle> ov, Toggle oldT, Toggle newT) {
+				settingsMap.put("board", (String) newT.getUserData());
 				if (newT.getUserData().equals("19")) {
 					handicap_19.setVisible(true);
 					handicap_9_13.setVisible(false);
@@ -185,22 +199,20 @@ public class Menu extends Application implements Observer {
 		//
 		Text byoyomiLabel = new Text("Byoyomi:");
 		byoyomiLabel.setFont(Font.font("Calibri", FontWeight.NORMAL, 16));
-		TextField byoyomi = new TextField();
-		byoyomi.setText(settingsMap.get("byoyomi"));
-		byoyomi.setMinWidth(20);
-		byoyomi.setPrefWidth(20);
+		ChoiceBox<String> byoyomi = new ChoiceBox<String>(
+				FXCollections.observableArrayList("0", "15", "30", "45", "60"));
+		byoyomi.getSelectionModel().select(settingsMap.get("byoyomi"));
+		byoyomi.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
+			public void changed(ObservableValue ov, Number value, Number new_value) {
+				settingsMap.put("byoyomi", byoyomi.getItems().get(new_value.intValue()));
+			}
+		});
 		form.add(byoyomiLabel, 2, 2);
 		form.add(byoyomi, 3, 2);
 
 		//
 		Text komiLabel = new Text("Komi:");
 		komiLabel.setFont(Font.font("Calibri", FontWeight.NORMAL, 16));
-		/*
-		 * Slider komi = new Slider(-9.5,9.5,Double.valueOf(settingsMap.get("komi")));
-		 * komi.setShowTickLabels(true); komi.setShowTickMarks(true);
-		 * komi.setMajorTickUnit(1); komi.setMinorTickCount(1);
-		 * komi.setBlockIncrement(.5); komi.setSnapToTicks(true);
-		 */
 		ListView<String> komi = new ListView<String>();
 		ObservableList<String> komiItems = FXCollections.observableArrayList("-9.5", "-9.0", "-8.5", "-8.0", "-7.5",
 				"-7.0", "-6.5", "-6.0", "-5.5", "-5.0", "-4.5", "-4.0", "-3.5", "-3.0", "-2.5", "-2.0", "-1,5", "-1.0",
@@ -211,6 +223,11 @@ public class Menu extends Application implements Observer {
 		komi.setOrientation(Orientation.HORIZONTAL);
 		komi.scrollTo(settingsMap.get("komi"));
 		komi.getSelectionModel().select(settingsMap.get("komi"));
+		komi.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
+			public void changed(ObservableValue ov, Number value, Number new_value) {
+				settingsMap.put("komi", komi.getItems().get(new_value.intValue()));
+			}
+		});
 		form.add(komiLabel, 0, 3);
 		form.add(komi, 1, 3, 3, 1);
 
@@ -238,29 +255,15 @@ public class Menu extends Application implements Observer {
 			color.selectToggle(colorB);
 			break;
 		}
+		color.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
+			public void changed(ObservableValue<? extends Toggle> ov, Toggle oldT, Toggle newT) {
+				settingsMap.put("playerColor", (String) newT.getUserData());
+			}
+		});
 		form.add(colorLabel, 0, 4);
 		form.add(colorB, 1, 4);
 		form.add(colorW, 2, 4);
 		form.add(colorN, 3, 4);
-
-		//
-		Text rulesLabel = new Text("Rules:");
-		rulesLabel.setFont(Font.font("Calibri", FontWeight.NORMAL, 16));
-		final ToggleGroup rules = new ToggleGroup();
-		RadioButton rulesJ = new RadioButton("Japanese");
-		rulesJ.setUserData("japanese");
-		rulesJ.setToggleGroup(rules);
-		RadioButton rulesC = new RadioButton("Chinese");
-		rulesC.setUserData("chinese");
-		rulesC.setToggleGroup(rules);
-		if (settingsMap.get("rules").equals("chinese")) {
-			rules.selectToggle(rulesC);
-		} else {
-			rules.selectToggle(rulesJ);
-		}
-		form.add(rulesLabel, 0, 5);
-		form.add(rulesJ, 1, 5);
-		form.add(rulesC, 2, 5);
 
 		// Local Dialog.
 		Dialog<Pair<String, String>> dialogL = new Dialog<>();
@@ -288,7 +291,7 @@ public class Menu extends Application implements Observer {
 		dialogLGrid.add(player1L, 1, 0);
 		dialogLGrid.add(new Label("Player 2:"), 0, 1);
 		dialogLGrid.add(player2L, 1, 1);
-		dialogLGrid.add(new ImageView(this.getClass().getResource("res/img/multi_local.png").toString()), 2, 0, 1, 2);
+		dialogLGrid.add(new ImageView(this.getClass().getResource("/img/multi_local.png").toString()), 2, 0, 1, 2);
 
 		dialogL.getDialogPane().setContent(dialogLGrid);
 
@@ -326,7 +329,7 @@ public class Menu extends Application implements Observer {
 		dialogSGrid.add(player1S, 1, 0);
 		dialogSGrid.add(new Label("Server Port:"), 0, 1);
 		dialogSGrid.add(portS, 1, 1);
-		dialogSGrid.add(new ImageView(this.getClass().getResource("res/img/multi_online.png").toString()), 2, 0, 1, 2);
+		dialogSGrid.add(new ImageView(this.getClass().getResource("/img/multi_online.png").toString()), 2, 0, 1, 2);
 
 		dialogS.getDialogPane().setContent(dialogSGrid);
 
@@ -369,7 +372,7 @@ public class Menu extends Application implements Observer {
 		dialogCGrid.add(ip, 1, 1);
 		dialogCGrid.add(new Label("Port:"), 0, 2);
 		dialogCGrid.add(portC, 1, 2);
-		dialogCGrid.add(new ImageView(this.getClass().getResource("res/img/multi_online.png").toString()), 2, 0, 1, 3);
+		dialogCGrid.add(new ImageView(this.getClass().getResource("/img/multi_online.png").toString()), 2, 0, 1, 3);
 
 		dialogC.getDialogPane().setContent(dialogCGrid);
 
@@ -407,7 +410,6 @@ public class Menu extends Application implements Observer {
 					break;
 				case "CLIENT":
 					dialogC.showAndWait().ifPresent(playerIPPort -> {
-						System.out.println(playerIPPort.getValue());
 						String[] ipPort = playerIPPort.getValue().split(";");
 						settingsMap.replace("player2", playerIPPort.getKey());
 						settingsMap.replace("ip", ipPort[0]);
@@ -418,7 +420,7 @@ public class Menu extends Application implements Observer {
 
 			}
 		});
-		form.add(multiBtn, 0, 6, 2, 1);
+		form.add(multiBtn, 0, 5, 2, 1);
 
 		//
 		Button saveBtn = new Button();
@@ -433,22 +435,21 @@ public class Menu extends Application implements Observer {
 				settingsMap.replace("handicap",
 						handicap_19.isVisible() ? handicap_19.getValue() : handicap_9_13.getValue());
 				settingsMap.replace("komi", komi.getSelectionModel().getSelectedItem());
-				settingsMap.replace("byoyomi", byoyomi.getText());
+				settingsMap.replace("byoyomi", byoyomi.getSelectionModel().getSelectedItem().toString());
 				settingsMap.replace("playerColor", (String) color.getSelectedToggle().getUserData());
-				settingsMap.replace("rules", (String) rules.getSelectedToggle().getUserData());
 				if (settings.parseMap(settingsMap)) {
 					if (settings.write()) {
-						form.add(new ImageView(this.getClass().getResource("res/img/ok_tick.png").toString()), 1, 7);
+						form.add(new ImageView(this.getClass().getResource("/img/ok_tick.png").toString()), 1, 6);
 					} else {
-						form.add(new ImageView(this.getClass().getResource("res/img/ko_cross.png").toString()), 1, 7);
+						form.add(new ImageView(this.getClass().getResource("/img/ko_cross.png").toString()), 1, 6);
 					}
 				} else {
-					form.add(new ImageView(this.getClass().getResource("res/img/ko_cross.png").toString()), 1, 7);
+					form.add(new ImageView(this.getClass().getResource("/img/ko_cross.png").toString()), 1, 6);
 
 				}
 			}
 		});
-		form.add(saveBtn, 0, 7);
+		form.add(saveBtn, 0, 6);
 
 		//
 		Button backBtn = new Button();
@@ -460,7 +461,7 @@ public class Menu extends Application implements Observer {
 				showMenu();
 			}
 		});
-		form.add(backBtn, 2, 7);
+		form.add(backBtn, 2, 6);
 
 		//
 		Button startBtn = new Button();
@@ -470,11 +471,12 @@ public class Menu extends Application implements Observer {
 
 			@Override
 			public void handle(ActionEvent event) {
-				Init.initGame(settings);
+				settings.parseMap(settingsMap);
 				ps.close();
+				Init.initGame(settingsMap.get("type") == "LOCAL");
 			}
 		});
-		form.add(startBtn, 3, 7);
+		form.add(startBtn, 3, 6);
 
 		//
 		//
@@ -489,7 +491,7 @@ public class Menu extends Application implements Observer {
 		bpane.setCenter(form);
 
 		Scene scene = new Scene(bpane, 384, 384);
-		scene.getStylesheets().add(getClass().getResource("res/css/menu.css").toExternalForm());
+		scene.getStylesheets().add(getClass().getResource("/css/menu.css").toExternalForm());
 
 		return scene;
 	}
@@ -498,7 +500,12 @@ public class Menu extends Application implements Observer {
 		Alert nafDialog = new Alert(AlertType.ERROR);
 		nafDialog.setTitle("Error");
 		nafDialog.setHeaderText("Not a File!");
-		nafDialog.setContentText("The path you entered does not correspond to a valid file or is unreadable!");
+		nafDialog.setContentText("The path you provided does not correspond to a valid file or is unreadable!");
+
+		Alert readEDialog = new Alert(AlertType.ERROR);
+		readEDialog.setTitle("Error");
+		readEDialog.setHeaderText("Could not load this file!");
+		readEDialog.setContentText("The path you provided corresponds to either invalid file or corrupted file!");
 
 		TextField filePath = new TextField();
 		filePath.setPrefWidth(240);
@@ -525,8 +532,11 @@ public class Menu extends Application implements Observer {
 			public void handle(final ActionEvent e) {
 				File file = new File(filePath.getText());
 				if (file != null && file.canRead() && file.getName().endsWith(".jgo")) {
-					Init.initGame(file);
-					ps.close();
+					if (Init.initGame(file)) {
+						ps.close();
+					} else {
+						readEDialog.showAndWait();
+					}
 				} else {
 					nafDialog.showAndWait();
 				}
@@ -564,7 +574,7 @@ public class Menu extends Application implements Observer {
 		bpane.setBottom(buttonBox);
 
 		Scene scene = new Scene(bpane, 384, 384);
-		scene.getStylesheets().add(getClass().getResource("res/css/menu.css").toExternalForm());
+		scene.getStylesheets().add(getClass().getResource("/css/menu.css").toExternalForm());
 
 		return scene;
 	}
@@ -603,7 +613,7 @@ public class Menu extends Application implements Observer {
 		bpane.setCenter(buttons);
 
 		Scene scene = new Scene(bpane, 384, 384);
-		scene.getStylesheets().add(getClass().getResource("res/css/menu.css").toExternalForm());
+		scene.getStylesheets().add(getClass().getResource("/css/menu.css").toExternalForm());
 
 		return scene;
 	}
