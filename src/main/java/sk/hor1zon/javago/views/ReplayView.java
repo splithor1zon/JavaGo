@@ -1,9 +1,8 @@
 package sk.hor1zon.javago.views;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -12,8 +11,8 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -27,7 +26,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import sk.hor1zon.javago.Init;
 import sk.hor1zon.javago.game.History;
 import sk.hor1zon.javago.game.ReplayController;
@@ -35,11 +33,15 @@ import sk.hor1zon.javago.game.Stone;
 import sk.hor1zon.javago.game.StoneColor;
 import sk.hor1zon.javago.game.ViewAction;
 import sk.hor1zon.javago.game.boards.BoardCanvas;
-import sk.hor1zon.javago.models.GameModel;
-import sk.hor1zon.javago.models.ReplayModel;
 import sk.hor1zon.javago.utils.Resources;
 import sk.hor1zon.javago.utils.Settings;
 
+/**
+ * Provides GUI capabilities for replaying saved finished games.
+ * 
+ * @author splithor1zon
+ *
+ */
 public class ReplayView extends Application implements Observer {
 	private int menuWidth = 25;
 	private int dashboardWidth = 200;
@@ -52,6 +54,11 @@ public class ReplayView extends Application implements Observer {
 	private Label player2time;
 	private Label cursorLabel;
 
+	/**
+	 * Creates ReplayView with provided reference to ReplayController.
+	 * 
+	 * @param rc ReplayController to communicate with.
+	 */
 	public ReplayView(ReplayController rc) {
 		this.rc = rc;
 		board = new BoardCanvas(Settings.currentRef.board);
@@ -67,19 +74,18 @@ public class ReplayView extends Application implements Observer {
 				case PLACEBATCH:
 					board.initGrid();
 					Stone[] toPlace = (Stone[]) action.getContent();
-					Stone last = toPlace[toPlace.length-1];
-					StoneColor player1color = Settings.currentRef.playerColor == "white" ? StoneColor.WHITE : StoneColor.BLACK;
+					Stone last = toPlace[toPlace.length - 1];
+					StoneColor player1color = Settings.currentRef.playerColor == "white" ? StoneColor.WHITE
+							: StoneColor.BLACK;
 					for (Stone stone : toPlace) {
 						playStone(stone);
 					}
-					
+
 					int onTurn = last.getColor() == player1color ? 2 : 1;
 					setActivePlayer(onTurn);
-					int[] tp = {
-							onTurn == 1 ? 2 : 1, last.getPlaceTime()
-					};
+					int[] tp = { onTurn == 1 ? 2 : 1, last.getPlaceTime() };
 					updateTime(tp);
-					updateCursor(toPlace.length-1);
+					updateCursor(toPlace.length - 1);
 					break;
 				case FINISH:
 					showFinish();
@@ -115,7 +121,7 @@ public class ReplayView extends Application implements Observer {
 		VBox.setVgrow(boardP, Priority.ALWAYS);
 		boardP.getChildren().add(1, dashboardP);
 		rootP.getChildren().add(1, boardP);
-		
+
 		// +25 is to compensate for menu bar, + 200 is for dashboard
 		Scene scene = new Scene(rootP, 560 + dashboardWidth, 560 + menuWidth);
 		scene.getStylesheets().add(getClass().getResource("/css/game.css").toExternalForm());
@@ -257,7 +263,7 @@ public class ReplayView extends Application implements Observer {
 		Label timer = new Label("00:00:00");
 		// timer.setAlignment(Pos.CENTER);
 		timer.setFont(Font.font("Calibri", FontWeight.NORMAL, 20));
-		
+
 		if (white) {
 			playerName.setId("active");
 		} else {
@@ -314,10 +320,7 @@ public class ReplayView extends Application implements Observer {
 	}
 
 	private void playStone(Stone toPlace) {
-		ArrayList<Stone> toRemove = board.placeStone(toPlace, true);
-		if (toRemove.size() > 0) {
-			rc.removedNotice(toRemove);
-		}
+		board.placeStone(toPlace, true);
 	}
 
 	private void setActivePlayer(int player) {
@@ -345,7 +348,7 @@ public class ReplayView extends Application implements Observer {
 	private void updateCursor(int cursor) {
 		cursorLabel.setText(Integer.toString(cursor));
 	}
-	
+
 	private void showFinish() {
 		Alert endDialog = new Alert(AlertType.INFORMATION);
 		endDialog.setTitle("End of game");

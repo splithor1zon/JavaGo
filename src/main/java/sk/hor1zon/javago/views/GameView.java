@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
-
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -23,7 +22,6 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
@@ -51,8 +49,11 @@ import sk.hor1zon.javago.game.boards.BoardCanvas;
 import sk.hor1zon.javago.models.GameModel;
 import sk.hor1zon.javago.utils.Resources;
 import sk.hor1zon.javago.utils.Settings;
+
 /**
- * The View component of MVC structure, initializes game GUI and reacts to events with calling controller functions.
+ * The View component of MVC structure, initializes game GUI and reacts to
+ * events with calling controller functions.
+ * 
  * @author splithor1zon
  *
  */
@@ -73,11 +74,22 @@ public class GameView extends Application implements Observer {
 	private boolean remoteGame = Settings.currentRef.type != GameType.LOCAL;
 	private boolean allowedPlacing = Settings.currentRef.playerColor == "white";
 
+	/**
+	 * Creates an instance of GameView with blank board.
+	 * 
+	 * @param c Reference to Controller to send commands to.
+	 */
 	public GameView(ControllerIntf c) {
 		this.c = c;
 		board = new BoardCanvas(Settings.currentRef.board);
 	}
 
+	/**
+	 * Creates an instance of GameView with provided Stone placement.
+	 * 
+	 * @param stoneGrid 2D array of Stones placed on board
+	 * @param c         Reference to Controller to send commands to.
+	 */
 	public GameView(ControllerIntf c, Stone[][] stoneGrid) {
 		this.c = c;
 		board = new BoardCanvas(Settings.currentRef.board, stoneGrid);
@@ -88,7 +100,6 @@ public class GameView extends Application implements Observer {
 		this.ps = primaryStage;
 		initV();
 	}
-
 
 	@Override
 	public void update(Observable ov, Object objAction) {
@@ -140,9 +151,11 @@ public class GameView extends Application implements Observer {
 		VBox player2;
 		if (remoteGame) {
 			boolean white = Settings.currentRef.playerColor.equals("white");
-			player1 = playerPane(Settings.currentRef.player1, Settings.currentRef.type == GameType.SERVER ? white : !white,
+			player1 = playerPane(Settings.currentRef.player1,
+					Settings.currentRef.type == GameType.SERVER ? white : !white,
 					Settings.currentRef.type == GameType.SERVER);
-			player2 = playerPane(Settings.currentRef.player2, Settings.currentRef.type == GameType.CLIENT ? white : !white,
+			player2 = playerPane(Settings.currentRef.player2,
+					Settings.currentRef.type == GameType.CLIENT ? white : !white,
 					Settings.currentRef.type == GameType.CLIENT);
 			if (Settings.currentRef.type == GameType.SERVER) {
 				player1prisoners = (Label) player1.getChildren().get(4);

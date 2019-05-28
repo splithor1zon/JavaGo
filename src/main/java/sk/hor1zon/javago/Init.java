@@ -13,25 +13,28 @@ import sk.hor1zon.javago.game.ReplayController;
 import sk.hor1zon.javago.game.Stone;
 import sk.hor1zon.javago.models.GameModel;
 import sk.hor1zon.javago.models.InitModel;
-import sk.hor1zon.javago.models.Model;
 import sk.hor1zon.javago.models.ReplayModel;
 import sk.hor1zon.javago.utils.Settings;
 import sk.hor1zon.javago.views.GameView;
 import sk.hor1zon.javago.views.ReplayView;
+
 /**
- * This class is the main class of this Application, manages Menu and initialization of the Game.
+ * This class is the main class of this Application, manages Menu and
+ * initialization of the Game.
+ * 
  * @author splithor1zon
  *
  */
 public class Init {
-	private static Model m;
 	private static ControllerIntf c;
 	private static GameView gv;
 	private static ReplayModel rm;
 	private static ReplayController rc;
 	private static ReplayView rv;
+
 	/**
 	 * Main class, starts Menu GUI.
+	 * 
 	 * @param args
 	 */
 	public static void main(String[] args) {
@@ -44,9 +47,11 @@ public class Init {
 	}
 
 	/**
-	 * After selecting whether to load or create new game the InitModel is initialized.
+	 * After selecting whether to load or create new game the InitModel is
+	 * initialized.
+	 * 
 	 * @param isNew Whether the selected option is New Game.
-	 * @param menu Provide reference to running Menu class instance.
+	 * @param menu  Provide reference to running Menu class instance.
 	 */
 	public static void initModel(boolean isNew, Menu menu) {
 		InitModel im = new InitModel(isNew);
@@ -57,8 +62,9 @@ public class Init {
 	}
 
 	/**
-	 * This method is called only when new game was selected.
-	 * Creates the MVC structure of the game itself and starts it.
+	 * This method is called only when new game was selected. Creates the MVC
+	 * structure of the game itself and starts it.
+	 * 
 	 * @param isLocal Whether if the game is intended to be local.
 	 */
 	public static void initGame(boolean isLocal) {
@@ -114,9 +120,9 @@ public class Init {
 	}
 
 	/**
-	 * This method is called only when load game was selected.
-	 * Loads game from file.
+	 * This method is called only when load game was selected. Loads game from file.
 	 * Creates the MVC structure of the game itself and starts it.
+	 * 
 	 * @param file Saved game file.
 	 */
 	public static boolean initGame(File file) {
@@ -124,7 +130,7 @@ public class Init {
 		Game game = Game.load(file);
 		if (game == null) {
 			return false;
-		} 
+		}
 		gameParse(game);
 		if (!game.isFinal) {
 			switch (Settings.currentRef.type) {
@@ -145,7 +151,7 @@ public class Init {
 			default:
 				return false;
 			}
-			
+
 			if (gv != null) {
 				try {
 					gv.stop();
@@ -160,7 +166,7 @@ public class Init {
 					e1.printStackTrace();
 				}
 			}
-			
+
 			gv = new GameView(c, game.board);
 			Platform.runLater(new Runnable() {
 				public void run() {
@@ -174,7 +180,7 @@ public class Init {
 		} else {
 			rm = new ReplayModel();
 			rc = new ReplayController(rm);
-			
+
 			if (gv != null) {
 				try {
 					gv.stop();
@@ -189,7 +195,7 @@ public class Init {
 					e1.printStackTrace();
 				}
 			}
-			
+
 			rv = new ReplayView(rc);
 			Platform.runLater(new Runnable() {
 				public void run() {
@@ -201,14 +207,14 @@ public class Init {
 				}
 			});
 		}
-		
+
 		return true;
 	}
-	
+
 	private static void gameParse(Game game) {
 		if (game == null) {
 			return;
-		} 
+		}
 		Settings.setSettings(game.settings);
 		History.setHistory(game.history);
 	}

@@ -11,24 +11,37 @@ import sk.hor1zon.javago.game.Stone;
 import sk.hor1zon.javago.game.StoneColor;
 import sk.hor1zon.javago.utils.Settings;
 
+/**
+ * Used for drawing the board and statically provide methods for checking
+ * various rules of Go.
+ * 
+ * @author splithor1zon
+ *
+ */
 public class BoardCanvas extends Canvas {
 	private static int SIZE;
 	private final int SPACING_COUNT;
+
+	/**
+	 * Minimal dimension of Go board in pixels.
+	 */
 	public final int MIN_DIMENSION = 560;
 	private final int MIN_SPACING;
 	private GraphicsContext gc;
+
+	/**
+	 * Reference to currently used BoardCanvas.
+	 */
 	public static BoardCanvas currRef;
 
 	private static int spacing;
 	private static Stone[][] stoneGrid;
 
-	public static Stone[][] getStoneGrid() {
-		if (stoneGrid == null || stoneGrid.length != Settings.currentRef.board) {
-			stoneGrid = new Stone[Settings.currentRef.board][Settings.currentRef.board];
-		}
-		return stoneGrid;
-	}
-
+	/**
+	 * Create new instance of BoardCanvas with specified board size.
+	 * 
+	 * @param size Board size to create.
+	 */
 	public BoardCanvas(int size) {
 		SIZE = size;
 		SPACING_COUNT = SIZE + 1;
@@ -37,8 +50,14 @@ public class BoardCanvas extends Canvas {
 		heightProperty().addListener(evt -> scaling());
 		stoneGrid = new Stone[SIZE][SIZE];
 		currRef = this;
-		//drawBoard();
 	}
+
+	/**
+	 * Create new instance of BoardCanvas with stone placement predefined.
+	 * 
+	 * @param size  Board size to create.
+	 * @param sGrid 2D array of Stones to apply.
+	 */
 	public BoardCanvas(int size, Stone[][] sGrid) {
 		SIZE = size;
 		SPACING_COUNT = SIZE + 1;
@@ -121,7 +140,7 @@ public class BoardCanvas extends Canvas {
 		}
 	}
 
-	public void drawStones() {
+	private void drawStones() {
 		int stoneDiameter = spacing - 2;
 		int stoneRadius = stoneDiameter / 2;
 		for (Stone[] x : stoneGrid) {
@@ -135,6 +154,14 @@ public class BoardCanvas extends Canvas {
 		}
 	}
 
+	/**
+	 * Place Stone on the board by inserting it in the 2D array, also checks for
+	 * which stones are to be removed.
+	 * 
+	 * @param stoneToPlace The stone that is valid to place on board.
+	 * @param ko           If there is Ko situation.
+	 * @return Returns list of stones, that are being removed.
+	 */
 	public ArrayList<Stone> placeStone(Stone stoneToPlace, boolean ko) {
 		ArrayList<Stone> toRemove = new ArrayList<Stone>();
 		stoneGrid[stoneToPlace.getX()][stoneToPlace.getY()] = stoneToPlace;
@@ -157,6 +184,14 @@ public class BoardCanvas extends Canvas {
 		return toRemove;
 	}
 
+	/**
+	 * Checks for whether there are any other stones to remain on the board after
+	 * marking them to remove. Used in Ko situations.
+	 * 
+	 * @param virtualStone Stone to be placed on board, but after finishing to be
+	 *                     replaced with original content.
+	 * @return Returns List of stones that should remain on board.
+	 */
 	public static ArrayList<Stone> koRemain(Stone virtualStone) {
 		Stone tmp = stoneGrid[virtualStone.getX()][virtualStone.getY()];
 		stoneGrid[virtualStone.getX()][virtualStone.getY()] = virtualStone;
@@ -165,6 +200,16 @@ public class BoardCanvas extends Canvas {
 		return result;
 	}
 
+	/**
+	 * Recursive algorithm. Checks for whether there are any other stones to remain
+	 * on the board after marking them to remove. Used in Ko situations.
+	 * 
+	 * @param x          X coordinate for desired stone to check.
+	 * @param y          Y coordinate for desired stone to check.
+	 * @param restricted List of stones that are not to be checked, used in
+	 *                   recursion.
+	 * @return Returns List of stones that should remain on board.
+	 */
 	public static ArrayList<Stone> koRemain(int x, int y, ArrayList<Stone> restricted) {
 		StoneColor color = stoneGrid[x][y].getColor();
 		Stone[] neighbors = getAdjacent(x, y);
@@ -181,6 +226,13 @@ public class BoardCanvas extends Canvas {
 		return result;
 	}
 
+	/**
+	 * Checks whether the intersection is occupied by another Stone.
+	 * 
+	 * @param x X coordinate of desired intersection check.
+	 * @param y Y coordinate of desired intersection check.
+	 * @return true if the intersection is already occupied.
+	 */
 	public static boolean isOccupied(int x, int y) {
 		if (stoneGrid[x][y] != null) {
 			return true;
@@ -189,6 +241,13 @@ public class BoardCanvas extends Canvas {
 		}
 	}
 
+	/**
+	 * Checks whether the stone on provided coordinates has any liberty.
+	 * 
+	 * @param x X coordinate of Stone to check.
+	 * @param y Y coordinate of Stone to check.
+	 * @return true - if has at least one liberty.
+	 */
 	public static boolean hasLiberty(int x, int y) {
 		int max = SIZE - 1;
 		if (x == max) {
@@ -218,6 +277,13 @@ public class BoardCanvas extends Canvas {
 
 	}
 
+	/**
+	 * Counts how many intersection there are neighboring provided coordinates.
+	 * 
+	 * @param x X coordinate to check.
+	 * @param y Y coordinate to check.
+	 * @return Count of how many intersections is neighboring provided coordinates.
+	 */
 	public static int neighborCount(int x, int y) {
 		int max = SIZE - 1;
 		if (x == max || x == 0) {
@@ -233,6 +299,13 @@ public class BoardCanvas extends Canvas {
 		}
 	}
 
+	/**
+	 * Get array of every stone that is adjacent to provided coordinates.
+	 * 
+	 * @param x X coordinate to check.
+	 * @param y Y coordinate to check.
+	 * @return Array of stones adjacent to provided coordinates.
+	 */
 	public static Stone[] getAdjacent(int x, int y) {
 		Stone[] neighbors;
 		int max = SIZE - 1;
@@ -286,6 +359,14 @@ public class BoardCanvas extends Canvas {
 		return neighbors;
 	}
 
+	/**
+	 * Checks whether group of same-colored Stones has any liberty after placement
+	 * of provided stone. Provided stone is placed only temporarily.
+	 * 
+	 * @param virtualStone Stone to be placed on board, but after finishing to be
+	 *                     replaced with original content.
+	 * @return true if the group has at least one liberty.
+	 */
 	public static boolean hasGroupLiberty(Stone virtualStone) {
 		Stone tmp = stoneGrid[virtualStone.getX()][virtualStone.getY()];
 		stoneGrid[virtualStone.getX()][virtualStone.getY()] = virtualStone;
@@ -294,6 +375,16 @@ public class BoardCanvas extends Canvas {
 		return result;
 	}
 
+	/**
+	 * Checks whether group, including Stone on provided coordinates, of
+	 * same-colored Stones has any liberty after placement of provided stone.
+	 * 
+	 * @param x            X coordinate of Stone in group to check.
+	 * @param y            Y coordinate of Stone in group to check.
+	 * @param virtualStone Stone to be placed on board, but after finishing to be
+	 *                     replaced with original content.
+	 * @return true if the group has at least one liberty.
+	 */
 	public static boolean hasGroupLiberty(int x, int y, Stone virtualStone) {
 		Stone tmp = stoneGrid[virtualStone.getX()][virtualStone.getY()];
 		stoneGrid[virtualStone.getX()][virtualStone.getY()] = virtualStone;
@@ -302,6 +393,16 @@ public class BoardCanvas extends Canvas {
 		return result;
 	}
 
+	/**
+	 * Recursive algorithm. Checks whether group, including Stone on provided
+	 * coordinates, of same-colored Stones has any liberty, with stone check
+	 * restriction List for preventing loops.
+	 * 
+	 * @param x          X coordinate of Stone in group to check.
+	 * @param y          Y coordinate of Stone in group to check.
+	 * @param restricted Stones that must not be checked (already checked).
+	 * @return true if the group has at least one liberty.
+	 */
 	public static boolean hasGroupLiberty(int x, int y, ArrayList<Stone> restricted) {
 		StoneColor color = stoneGrid[x][y].getColor();
 		Stone[] neighbors = getAdjacent(x, y);
@@ -320,6 +421,14 @@ public class BoardCanvas extends Canvas {
 		return false;
 	}
 
+	/**
+	 * Count how many liberties has the group in which provided Stone will belong
+	 * to.
+	 * 
+	 * @param virtualStone Stone to be placed on board, but after finishing to be
+	 *                     replaced with original content.
+	 * @return Count of liberties the group has.
+	 */
 	public static int resultingGroupLiberty(Stone virtualStone) {
 		Stone tmp = stoneGrid[virtualStone.getX()][virtualStone.getY()];
 		stoneGrid[virtualStone.getX()][virtualStone.getY()] = virtualStone;
@@ -328,6 +437,15 @@ public class BoardCanvas extends Canvas {
 		return result;
 	}
 
+	/**
+	 * Count how many liberties has the group in which Stone on provided coordinates
+	 * belongs to.
+	 * 
+	 * @param x          X coordinate of Stone in group to check.
+	 * @param y          Y coordinate of Stone in group to check.
+	 * @param restricted Stones that must not be checked (already checked).
+	 * @return Count of liberties the group has.
+	 */
 	public static int resultingGroupLiberty(int x, int y, ArrayList<Stone> restricted) {
 		StoneColor color = stoneGrid[x][y].getColor();
 		Stone[] neighbors = getAdjacent(x, y);
@@ -349,6 +467,13 @@ public class BoardCanvas extends Canvas {
 		return result;
 	}
 
+	/**
+	 * Translate provided real coordinate of mouse click into board coordinate.
+	 * Translates in regard to real board size (in px).
+	 * 
+	 * @param coord Real coordinate.
+	 * @return Translated board coordinate.
+	 */
 	public static int parseCoord(double coord) {
 		int c = (int) coord;
 		int gridCoord = spacing / 2;
@@ -364,18 +489,33 @@ public class BoardCanvas extends Canvas {
 		}
 	}
 
+	/**
+	 * Removes provided Stone from the board.
+	 * 
+	 * @param stoneToRemove Stone to remove from board.
+	 */
 	public void removeStone(Stone stoneToRemove) {
 		stoneGrid[stoneToRemove.getX()][stoneToRemove.getY()] = null;
 	}
 
+	/**
+	 * Removes provided collection of Stones from the board.
+	 * 
+	 * @param stonesToRemove Collection of Stones to remove from board.
+	 */
 	public void removeStone(Collection<Stone> stonesToRemove) {
 		for (Stone stone : stonesToRemove) {
 			removeStone(stone);
 		}
 	}
 
+	/**
+	 * Checks whether the Ko rule is applicable for Stone to be placed.
+	 * 
+	 * @param stone Stone to be placed.
+	 * @return true - if the Ko rule is applicable.
+	 */
 	public static boolean koApplicable(Stone stone) {
-		int count = 0;
 		Stone[] adj = getAdjacent(stone.getX(), stone.getY());
 		for (Stone s : adj) {
 			if (s == null || s.getColor() == stone.getColor()) {
@@ -390,6 +530,12 @@ public class BoardCanvas extends Canvas {
 		return false;
 	}
 
+	/**
+	 * Checks whether the Ko situation will happen after placing provided stone.
+	 * 
+	 * @param stone Stone to be placed.
+	 * @return true - if the Ko situation will arise.
+	 */
 	public static boolean ko(Stone stone) {
 		Stone[] adj = getAdjacent(stone.getX(), stone.getY());
 		History history = History.getRef();
@@ -408,9 +554,24 @@ public class BoardCanvas extends Canvas {
 			return false;
 		}
 	}
-	
+
+	/**
+	 * Sets blank 2D array of Stones.
+	 */
 	public void initGrid() {
 		stoneGrid = new Stone[SIZE][SIZE];
+	}
+
+	/**
+	 * Get 2D array representation of placed stones.
+	 * 
+	 * @return 2D array of Stones
+	 */
+	public static Stone[][] getStoneGrid() {
+		if (stoneGrid == null || stoneGrid.length != Settings.currentRef.board) {
+			stoneGrid = new Stone[Settings.currentRef.board][Settings.currentRef.board];
+		}
+		return stoneGrid;
 	}
 
 	@Override

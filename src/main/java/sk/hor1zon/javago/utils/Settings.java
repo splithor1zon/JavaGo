@@ -10,7 +10,6 @@ import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -25,20 +24,59 @@ import sk.hor1zon.javago.game.GameType;
  *
  */
 public class Settings {
+	/**
+	 * Default path of where to save Settings.
+	 */
 	public final static String DEFAULT_PATH = "settings.json";
+	/**
+	 * Type of game.
+	 */
 	public GameType type;
-	public InetAddress ip; //
+	/**
+	 * IP of game.
+	 */
+	public InetAddress ip;
+	/**
+	 * Port of game.
+	 */
 	public int port;
+	/**
+	 * Name of player 1.
+	 */
 	public String player1;
-	public String player2; //
+	/**
+	 * Name of player 2.
+	 */
+	public String player2;
+	/**
+	 * Board size.
+	 */
 	public int board;
+	/**
+	 * Handicap stones count.
+	 */
 	public int handicap;
+	/**
+	 * Komi to add to score.
+	 */
 	public double komi;
+	/**
+	 * Byoyomi time for move.
+	 */
 	public int byoyomi;
+	/**
+	 * Player 1 color.
+	 */
 	public String playerColor;
+	/**
+	 * Reference to latest Settings.
+	 */
 	public static Settings currentRef;
 	private static Logger l = Logger.getLogger(Settings.class.getName());
 
+	/**
+	 * Creates new Settings and updates the reference to latest Settings.
+	 */
 	public Settings() {
 		useDefaults();
 		currentRef = this;
@@ -194,6 +232,7 @@ public class Settings {
 	 */
 	public Map<String, String> toMap() {
 		return new HashMap<String, String>(11, 1f) {
+			private static final long serialVersionUID = 1L;
 			{
 				put("type", type.name());
 				put("ip", ip.getHostAddress());

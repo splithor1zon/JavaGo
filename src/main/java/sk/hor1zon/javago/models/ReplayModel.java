@@ -1,31 +1,43 @@
 package sk.hor1zon.javago.models;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Observable;
-import java.util.Timer;
-
-import sk.hor1zon.javago.game.GameAlert;
 import sk.hor1zon.javago.game.History;
 import sk.hor1zon.javago.game.Stone;
 import sk.hor1zon.javago.game.StoneColor;
 import sk.hor1zon.javago.game.ViewAction;
 import sk.hor1zon.javago.utils.Settings;
 
+/**
+ * Creates simple model used for replaying games.
+ * @author splithor1zon
+ *
+ */
 public class ReplayModel extends Observable {
 	private History history;
+	/**
+	 * Current game time.
+	 */
 	public static int gameTime;
+	/**
+	 * Color of player 1.
+	 */
 	public static StoneColor player1color;
+	/**
+	 * Color of player 2.
+	 */
 	public static StoneColor player2color;
+	/**
+	 * Time of player 1.
+	 */
 	public static int player1time;
+	/**
+	 * Time of player 2.
+	 */
 	public static int player2time;
-	private int byoyomiTime;
-	private boolean byoyomiOn;
-	private int player1prisoners;
-	private int player2prisoners;
-	private static Timer timer;
-	private int player;
-
+	
+	/**
+	 * Create and initialize the ReplayModel.
+	 */
 	public ReplayModel() {
 		history = History.getRef();
 		Stone latest = history.getLatest();
@@ -36,15 +48,15 @@ public class ReplayModel extends Observable {
 		Stone latest2 = history.getLatest(player2color);
 		player1time = latest1 == null ? 0 : latest.getPlaceTime();
 		player2time = latest2 == null ? 0 : latest.getPlaceTime();
-		byoyomiTime = Settings.currentRef.byoyomi;
-		byoyomiOn = Settings.currentRef.byoyomi != 0;
-		player1prisoners = history.getPrisonerCount(player1color);
-		player2prisoners = history.getPrisonerCount(player2color);
-		timer = null;
-		player = Settings.currentRef.playerColor == "white" ? 1 : 2;
+		history.getPrisonerCount(player1color);
+		history.getPrisonerCount(player2color);
 
 	}
 
+	/**
+	 * Place batch of Stones at once.
+	 * @param toPlace Array of Stones to place.
+	 */
 	public void placeStones(Stone[] toPlace) {
 		ViewAction place = ViewAction.PLACEBATCH;
 		place.setContent(toPlace);
@@ -52,11 +64,19 @@ public class ReplayModel extends Observable {
 		notifyObservers(place);
 	}
 
+	/**
+	 * Show finish dialog.
+	 */
 	public void finish() {
 		setChanged();
 		notifyObservers(ViewAction.FINISH);
 	}
 
+	/**
+	 * Set the time of specified player.
+	 * @param newTime The time to set.
+	 * @param player For which player.
+	 */
 	public void setTime(int newTime, int player) {
 		int[] times = { player, newTime };
 		ViewAction timeNotice = ViewAction.UPDATE_TIME;

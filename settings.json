@@ -1,1 +1,1 @@
-{"type":"LOCAL","ip":"127.0.0.1","port":30303,"player1":"Alice","player2":"Bob","board":19,"handicap":0,"komi":6.5,"byoyomi":0,"playerColor":"black"}
+{"type":"LOCAL","ip":"127.0.0.1","port":30303,"player1":"a","player2":"Bob","board":13,"handicap":4,"komi":4.0,"byoyomi":45,"playerColor":"white"}

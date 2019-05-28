@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import sk.hor1zon.javago.models.GameModel;
 import sk.hor1zon.javago.utils.Settings;
 
 /**
  * Provides data structure for stone placements. Game can be recreated from it.
+ * 
  * @author splithor1zon
  *
  */
@@ -27,13 +27,13 @@ public class History {
 	}
 
 	/**
-	 * Get reference to curreently used history.
-	 * If there is none, then creates one.
+	 * Get reference to curreently used history. If there is none, then creates one.
+	 * 
 	 * @return Current history reference.
 	 */
 	public static History getRef() {
 		if (ref == null) {
-			synchronized(History.class) {
+			synchronized (History.class) {
 				if (ref == null) {
 					ref = new History();
 				}
@@ -44,6 +44,7 @@ public class History {
 
 	/**
 	 * Get all stones (active, prisoners) in one list sorted by id.
+	 * 
 	 * @return Sorted list.
 	 */
 	public ArrayList<Stone> getAllStones() {
@@ -76,6 +77,7 @@ public class History {
 
 	/**
 	 * Counts all placed stones.
+	 * 
 	 * @return Count of stones.
 	 */
 	public int getStoneCount() {
@@ -95,6 +97,7 @@ public class History {
 
 	/**
 	 * Counts active stones only of specified color.
+	 * 
 	 * @param color Color of stones to count.
 	 * @return Count of active stones with specified color.
 	 */
@@ -110,6 +113,7 @@ public class History {
 
 	/**
 	 * Counts prisoner stones of specified color.
+	 * 
 	 * @param color Color of stones to count.
 	 * @return Count of prisoner stones with specified color.
 	 */
@@ -124,7 +128,8 @@ public class History {
 	}
 
 	/**
-	 * Move specified stone to prison if on active list. 
+	 * Move specified stone to prison if on active list.
+	 * 
 	 * @param stone Stone to remove.
 	 */
 	public void moveStoneToPrison(Stone stone) {
@@ -142,6 +147,7 @@ public class History {
 
 	/**
 	 * Move list of stones to prison.
+	 * 
 	 * @param remove List of stones to remove.
 	 */
 	public void moveStonesToPrison(ArrayList<Stone> remove) {
@@ -152,6 +158,7 @@ public class History {
 
 	/**
 	 * Add stone to active list.
+	 * 
 	 * @param stone Stone to add.
 	 * @return true if successfully added.
 	 */
@@ -166,6 +173,7 @@ public class History {
 
 	/**
 	 * Get latest active stone.
+	 * 
 	 * @return Latest active stone.
 	 */
 	public Stone getLatest() {
@@ -182,9 +190,10 @@ public class History {
 		}
 		return latest;
 	}
-	
+
 	/**
 	 * Return latest stone of specified color.
+	 * 
 	 * @param color Latest stone of which color to return.
 	 * @return Latest color stone.
 	 */
@@ -202,9 +211,10 @@ public class History {
 		}
 		return latest;
 	}
-	
+
 	/**
 	 * Get latest prisoner stone.
+	 * 
 	 * @return Latest prisoner stone.
 	 */
 	public Stone getLatestPrisoner() {
@@ -217,6 +227,7 @@ public class History {
 
 	/**
 	 * Checks if the stone is in prison.
+	 * 
 	 * @param stone Stone to check.
 	 * @return true if is in prison.
 	 */
@@ -231,6 +242,7 @@ public class History {
 
 	/**
 	 * Finalizes the history.
+	 * 
 	 * @param whitePlayerScore Achieved score of white player.
 	 * @param blackPlayerScore Achieved score of black player.
 	 */
@@ -255,6 +267,12 @@ public class History {
 		return finalFlag;
 	}
 
+	/**
+	 * Get the score for specified stone color.
+	 * 
+	 * @param color Color of stones to get the score to.
+	 * @return Score.
+	 */
 	public double getScore(StoneColor color) {
 		if (color == StoneColor.BLACK) {
 			return blackPlayerScore;
@@ -263,14 +281,25 @@ public class History {
 		}
 	}
 
+	/**
+	 * Add pass move.
+	 */
 	public void addPass() {
 		active.add(null);
 	}
 
+	/**
+	 * Set history reference to provided one.
+	 * 
+	 * @param history History to set default reference to.
+	 */
 	public static void setHistory(History history) {
 		ref = history;
 	}
-	
+
+	/**
+	 * Set reference of history to null.
+	 */
 	public static void resetHistory() {
 		ref = null;
 	}

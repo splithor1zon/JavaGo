@@ -4,6 +4,7 @@ import sk.hor1zon.javago.models.GameModel;
 
 /**
  * Data structure of individual stones.
+ * 
  * @author splithor1zon
  *
  */
@@ -27,6 +28,7 @@ public class Stone {
 
 	/**
 	 * When stone is moved to prison, this function updates its prison time.
+	 * 
 	 * @return Returns false if already set.
 	 */
 	public boolean toPrison() {
@@ -37,11 +39,16 @@ public class Stone {
 			return false;
 		}
 	}
-	
+
+	/**
+	 * Checks whether this stone serves some jail time.
+	 * 
+	 * @return true if in prison.
+	 */
 	public boolean isPrisoner() {
 		return prisonTime != -1;
 	}
-	
+
 	public int getId() {
 		return id;
 	}
@@ -69,6 +76,7 @@ public class Stone {
 	public static void setIdxCounter(int idxSet) {
 		idx = idxSet;
 	}
+
 	public static void resetIdxCounter() {
 		idx = 0;
 	}
@@ -109,7 +117,13 @@ public class Stone {
 			return false;
 		return true;
 	}
-	
+
+	/**
+	 * Similar to equals, but checks only color and coordinates.
+	 * 
+	 * @param s Stone to check.
+	 * @return true if they are the same by color and coordinates.
+	 */
 	public boolean similar(Stone s) {
 		if (this == s)
 			return true;

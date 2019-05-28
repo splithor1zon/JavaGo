@@ -45,6 +45,7 @@ import sk.hor1zon.javago.utils.Settings;
 
 /**
  * Provides initial GUI for setting up the game.
+ * 
  * @author splithor1zon
  *
  */
@@ -54,6 +55,9 @@ public class Menu extends Application implements Observer {
 	private Stage ps;
 	private Menu ref;
 
+	/**
+	 * Create new Menu GUI.
+	 */
 	public Menu() {
 		ref = this;
 	}
