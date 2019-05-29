@@ -139,8 +139,7 @@ public class ReplayView extends Application implements Observer {
 
 		// --- Menu Game
 		Menu menuGame = new Menu("Game");
-		MenuItem newGame = new MenuItem("New Game",
-				new ImageView(new Image(Resources.getURLofImage("placeholder.png").toString())));
+		MenuItem newGame = new MenuItem("New Game");
 		newGame.setOnAction(new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent t) {
 				ps.close();
@@ -158,8 +157,7 @@ public class ReplayView extends Application implements Observer {
 			}
 		});
 
-		MenuItem mainMenu = new MenuItem("Main Menu",
-				new ImageView(new Image(Resources.getURLofImage("placeholder.png").toString())));
+		MenuItem mainMenu = new MenuItem("Main Menu");
 		mainMenu.setOnAction(new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent t) {
 				ps.close();
@@ -175,8 +173,7 @@ public class ReplayView extends Application implements Observer {
 				});
 			}
 		});
-		MenuItem exit = new MenuItem("Exit",
-				new ImageView(new Image(Resources.getURLofImage("placeholder.png").toString())));
+		MenuItem exit = new MenuItem("Exit");
 		exit.setOnAction(new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent t) {
 				ps.close();
@@ -187,8 +184,7 @@ public class ReplayView extends Application implements Observer {
 		// --- Menu Options
 		Menu menuOptions = new Menu("Options");
 
-		MenuItem boardCust = new MenuItem("Board...",
-				new ImageView(new Image(Resources.getURLofImage("placeholder.png").toString())));
+		MenuItem boardCust = new MenuItem("Board...");
 		boardCust.setOnAction(new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent t) {
 			}
@@ -199,15 +195,13 @@ public class ReplayView extends Application implements Observer {
 		// --- Menu Help
 		Menu menuHelp = new Menu("Help");
 
-		MenuItem help = new MenuItem("Help...",
-				new ImageView(new Image(Resources.getURLofImage("placeholder.png").toString())));
+		MenuItem help = new MenuItem("Help...");
 		help.setOnAction(new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent t) {
 			}
 		});
 
-		MenuItem about = new MenuItem("About JavaGo",
-				new ImageView(new Image(Resources.getURLofImage("placeholder.png").toString())));
+		MenuItem about = new MenuItem("About JavaGo");
 		about.setOnAction(new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent t) {
 			}
