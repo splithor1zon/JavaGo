@@ -2,37 +2,34 @@ package sk.hor1zon.javago.test.history;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
-
-import java.util.ArrayList;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-
 import sk.hor1zon.javago.game.History;
 import sk.hor1zon.javago.game.Stone;
 import sk.hor1zon.javago.game.StoneColor;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class GetPrisonerCountTest {
 
 	@Mock
 	Stone s1;
-	
+
 	@Mock
 	Stone s2;
-	
+
 	@Mock
 	Stone s3;
-	
+
 	History h = History.getRef();;
+
 	@Before
 	public void setUp() {
 		History.resetHistory();
 	}
-	
+
 	@Test
 	public void testAdd3prisonersRightColor() {
 		when(s1.getColor()).thenReturn(StoneColor.WHITE);
@@ -47,6 +44,7 @@ public class GetPrisonerCountTest {
 		long res = h.getPrisonerCount(StoneColor.WHITE);
 		assertEquals(3, res);
 	}
+
 	@Test
 	public void testAdd3prisonersWrongColor() {
 		when(s1.getColor()).thenReturn(StoneColor.WHITE);
@@ -61,6 +59,7 @@ public class GetPrisonerCountTest {
 		long res = h.getPrisonerCount(StoneColor.BLACK);
 		assertEquals(0, res);
 	}
+
 	@Test
 	public void testAdd2Stones1prisoner() {
 		when(s1.getColor()).thenReturn(StoneColor.WHITE);
@@ -73,6 +72,7 @@ public class GetPrisonerCountTest {
 		long res = h.getPrisonerCount(StoneColor.WHITE);
 		assertEquals(1, res);
 	}
+
 	@Test
 	public void testAdd2Stones1prisoner1null() {
 		when(s1.getColor()).thenReturn(StoneColor.WHITE);
@@ -85,5 +85,5 @@ public class GetPrisonerCountTest {
 		long res = h.getPrisonerCount(StoneColor.WHITE);
 		assertEquals(1, res);
 	}
-	
+
 }

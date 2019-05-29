@@ -2,38 +2,36 @@ package sk.hor1zon.javago.test.history;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
-
 import java.util.ArrayList;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-
 import sk.hor1zon.javago.game.History;
 import sk.hor1zon.javago.game.Stone;
 import sk.hor1zon.javago.game.StoneColor;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class MoveStonesToPrisonTest {
 	@Mock
 	Stone s1;
-	
+
 	@Mock
 	Stone s2;
-	
+
 	@Mock
 	Stone s3;
-	
+
 	History h = History.getRef();
 	ArrayList<Stone> ar;
+
 	@Before
 	public void setUp() {
 		History.resetHistory();
 		ar = new ArrayList<Stone>();
 	}
-	
+
 	@Test
 	public void testAdd3Stones() {
 		when(s1.getColor()).thenReturn(StoneColor.WHITE);
@@ -46,6 +44,7 @@ public class MoveStonesToPrisonTest {
 		long res = h.getPrisonerCount(StoneColor.WHITE);
 		assertEquals(0, res);
 	}
+
 	@Test
 	public void testAdd3prisonMixedColor() {
 		when(s1.getColor()).thenReturn(StoneColor.WHITE);
@@ -61,6 +60,7 @@ public class MoveStonesToPrisonTest {
 		long res = h.getPrisonerCount(StoneColor.BLACK);
 		assertEquals(2, res);
 	}
+
 	@Test
 	public void testAdd1Stone2prison1null() {
 		when(s1.getColor()).thenReturn(StoneColor.WHITE);

@@ -4,7 +4,8 @@ import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
 
-import sk.hor1zon.javago.test.suites.*;
+import sk.hor1zon.javago.test.suites.BoardCanvasTestSuite;
+import sk.hor1zon.javago.test.suites.HistoryTestSuite;
 
 public class TestRunner {
 
@@ -12,10 +13,15 @@ public class TestRunner {
 		Result result = JUnitCore.runClasses(HistoryTestSuite.class, BoardCanvasTestSuite.class);
 
 		for (Failure failure : result.getFailures()) {
-			System.out.println(failure.toString());
+			System.err.println(failure.toString());
 		}
 
-		System.out.println(result.wasSuccessful());
+		if (result.wasSuccessful()) {
+			System.out.println("\nAll tests passed.");
+		} else {
+			System.err.println("\nThere were some errors while running tests.");
+		}
+		
 	}
 
 }

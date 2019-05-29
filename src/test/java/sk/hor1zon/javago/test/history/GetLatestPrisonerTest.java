@@ -14,24 +14,25 @@ import sk.hor1zon.javago.game.History;
 import sk.hor1zon.javago.game.Stone;
 import sk.hor1zon.javago.game.StoneColor;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class GetLatestPrisonerTest {
 
 	@Mock
 	Stone s1;
-	
+
 	@Mock
 	Stone s2;
-	
+
 	@Mock
 	Stone s3;
-	
+
 	History h = History.getRef();;
+
 	@Before
 	public void setUp() {
 		History.resetHistory();
 	}
-	
+
 	@Test
 	public void testAdd3Stones() {
 		when(s1.getColor()).thenReturn(StoneColor.WHITE);
@@ -43,6 +44,7 @@ public class GetLatestPrisonerTest {
 		Stone res = h.getLatestPrisoner();
 		assertNull(res);
 	}
+
 	@Test
 	public void testAdd2Stones1prisoner() {
 		when(s1.getColor()).thenReturn(StoneColor.BLACK);
@@ -56,6 +58,7 @@ public class GetLatestPrisonerTest {
 		Stone res = h.getLatestPrisoner();
 		assertEquals(s2, res);
 	}
+
 	@Test
 	public void testAdd1Stone2null() {
 		when(s1.getColor()).thenReturn(StoneColor.BLACK);

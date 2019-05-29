@@ -1,39 +1,34 @@
 package sk.hor1zon.javago.test.history;
 
 import static org.junit.Assert.assertEquals;
-
+import static org.mockito.Mockito.when;
+import java.util.ArrayList;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import static org.mockito.Mockito.*;
-
-import java.util.ArrayList;
-
 import org.mockito.junit.MockitoJUnitRunner;
-
-import javafx.beans.binding.When;
 import sk.hor1zon.javago.game.History;
 import sk.hor1zon.javago.game.Stone;
-import sk.hor1zon.javago.game.boards.BoardCanvas;
 
 @RunWith(MockitoJUnitRunner.class)
 public class GetAllTest {
 	@Mock
 	Stone s1;
-	
+
 	@Mock
 	Stone s2;
-	
+
 	@Mock
 	Stone s3;
-	
+
 	History h = History.getRef();;
+
 	@Before
 	public void setUp() {
 		History.resetHistory();
 	}
-	
+
 	@Test
 	public void testAdd3Stones() {
 		when(s1.getId()).thenReturn(3);
@@ -48,6 +43,7 @@ public class GetAllTest {
 		assertEquals(s1, res.get(2));
 		assertEquals(3, res.size());
 	}
+
 	@Test
 	public void testAdd2Stones1null() {
 		when(s1.getId()).thenReturn(3);
@@ -60,6 +56,7 @@ public class GetAllTest {
 		assertEquals(s1, res.get(1));
 		assertEquals(2, res.size());
 	}
+
 	@Test
 	public void testAdd2null() {
 		h.addPass();

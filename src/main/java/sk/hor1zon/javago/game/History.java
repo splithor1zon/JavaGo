@@ -207,6 +207,8 @@ public class History {
 			latest = active.get(i);
 			if (latest != null && latest.getColor() == color) {
 				break;
+			} else {
+				latest = null;
 			}
 		}
 		return latest;
