@@ -29,8 +29,8 @@ public class GameModel extends Observable implements Model {
 	public GameModel() {
 		history = History.getRef();
 		gameTime = 0;
-		player1color = Settings.currentRef.playerColor == "white" ? StoneColor.WHITE : StoneColor.BLACK;
-		player2color = Settings.currentRef.playerColor == "white" ? StoneColor.BLACK : StoneColor.WHITE;
+		player1color = Settings.currentRef.playerColor.equals("white") ? StoneColor.WHITE : StoneColor.BLACK;
+		player2color = Settings.currentRef.playerColor.equals("white") ? StoneColor.BLACK : StoneColor.WHITE;
 		player1time = 0;
 		player2time = 0;
 		byoyomiTime = Settings.currentRef.byoyomi;
@@ -39,9 +39,10 @@ public class GameModel extends Observable implements Model {
 		player2prisoners = history.getPrisonerCount(player1color);
 		timer = null;
 		player = Settings.currentRef.type != GameType.LOCAL
-				? (Settings.currentRef.playerColor == "white" ? (Settings.currentRef.type == GameType.SERVER ? 1 : 2)
+				? (Settings.currentRef.playerColor.equals("white") ? (Settings.currentRef.type == GameType.SERVER ? 1 : 2)
 						: (Settings.currentRef.type == GameType.SERVER ? 2 : 1))
-				: Settings.currentRef.playerColor == "white" ? 1 : 2;
+				: Settings.currentRef.playerColor.equals("white") ? 1 : 2;
+				System.out.println(Settings.currentRef.playerColor.equals("white") ? 1 : 2);
 	}
 
 	public void alert(GameAlert gameAlert) {

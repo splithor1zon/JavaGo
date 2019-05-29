@@ -72,7 +72,7 @@ public class GameView extends Application implements Observer {
 	private Button player1pass;
 	private Button player2pass;
 	private boolean remoteGame = Settings.currentRef.type != GameType.LOCAL;
-	private boolean allowedPlacing = Settings.currentRef.playerColor == "white";
+	private boolean allowedPlacing = Settings.currentRef.playerColor.equals("white");
 
 	/**
 	 * Creates an instance of GameView with blank board.
@@ -558,7 +558,7 @@ public class GameView extends Application implements Observer {
 		dialogNeg.setTitle("Result negotiaton");
 		dialogNeg.setHeaderText("Please negotiate with your opponent scoring of each player.\nAccepting only integer!"
 				+ "\nKomi of " + Settings.currentRef.komi + " will be added to white player ("
-				+ (Settings.currentRef.playerColor == "white" ? Settings.currentRef.player1
+				+ (Settings.currentRef.playerColor.equals("white") ? Settings.currentRef.player1
 						: Settings.currentRef.player2)
 				+ ").\nThe number of placed black stones is: " + History.getRef().getActiveStoneCount(StoneColor.BLACK)
 				+ ".\nThe number of placed white stones is: " + History.getRef().getActiveStoneCount(StoneColor.WHITE)
@@ -664,12 +664,12 @@ public class GameView extends Application implements Observer {
 		dialogFinGrid.add(infoText, 0, 0, 2, 1);
 		dialogFinGrid.add(new Label(Settings.currentRef.player1 + "'s result:"), 0, 1);
 		dialogFinGrid.add(new Text(Double
-				.toString((Settings.currentRef.playerColor == "white" ? History.getRef().getScore(StoneColor.WHITE)
+				.toString((Settings.currentRef.playerColor.equals("white") ? History.getRef().getScore(StoneColor.WHITE)
 						: History.getRef().getScore(StoneColor.BLACK)))),
 				1, 1);
 		dialogFinGrid.add(new Label(Settings.currentRef.player2 + "'s result:"), 0, 2);
 		dialogFinGrid.add(new Text(Double
-				.toString((Settings.currentRef.playerColor == "white" ? History.getRef().getScore(StoneColor.BLACK)
+				.toString((Settings.currentRef.playerColor.equals("white") ? History.getRef().getScore(StoneColor.BLACK)
 						: History.getRef().getScore(StoneColor.WHITE)))),
 				1, 2);
 

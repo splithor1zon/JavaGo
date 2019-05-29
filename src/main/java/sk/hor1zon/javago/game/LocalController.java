@@ -19,7 +19,7 @@ import sk.hor1zon.javago.views.GameView;
 public class LocalController implements ControllerIntf{
 
 	private Model model;
-	private int playerTurn = Settings.currentRef.playerColor == "white" ? 1 : 2;
+	private int playerTurn = Settings.currentRef.playerColor.equals("white") ? 1 : 2;
 	private boolean whiteTurn = true;
 	private boolean player1previousPass = false;
 	private boolean player2previousPass = false;
@@ -90,7 +90,7 @@ public class LocalController implements ControllerIntf{
 
 	@Override
 	public void resultNegotiation(boolean conclusion, double player1score, double player2score) {
-		if (Settings.currentRef.playerColor == "white") {
+		if (Settings.currentRef.playerColor.equals("white")) {
 			player1score += Settings.currentRef.komi;
 		} else {
 			player2score += Settings.currentRef.komi;
